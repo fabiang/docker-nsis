@@ -23,11 +23,9 @@ jobs:
             runs_on: 2025
         nsis:
           # https://sourceforge.net/projects/nsis/files/NSIS%203/3.12/
-          # Hash is SHA256
           - version: "3.12"
             version_minor: "3.12"
             version_major: "3"
-            download_hash: "56581f90db321581c5381193d796fffcf2d24b2f8fed2160a6c6a3baa67f2c4f"
 
     env:
       IMAGE_NAME_FULL: "fabiang/nsis:${{ matrix.nsis.version }}-windows${{ matrix.windows.image }}-${{ matrix.windows.version }}"
@@ -53,7 +51,6 @@ jobs:
             -t '${{ env.IMAGE_NAME_FULL }}' `
             `
             --build-arg 'NSIS_VERSION=${{ matrix.nsis.version }}' `
-            --build-arg 'NSIS_DOWNLOAD_HASH_SHA256=${{ matrix.nsis.download_hash }}' `
             `
             --build-arg 'WINDOWS_IMAGE=${{ matrix.windows.image }}' `
             --build-arg 'WINDOWS_VERSION=${{ matrix.windows.version }}' `
@@ -67,11 +64,13 @@ jobs:
         if: "${{ matrix.nsis.version_major != '' }}"
         run: docker tag '${{ env.IMAGE_NAME_FULL }}' '${{ env.IMAGE_NAME_MAJOR }}'
 
-      - name: Test image
+      - name: Test Image
         run: |
-          docker run -t --rm --entrypoint='' `
+          docker run --rm -v "${{ github.workspace }}/tests/gui_app:C:\app" `
+            -w C:\app `
+            --entrypoint='' `
             '${{ env.IMAGE_NAME_FULL }}' `
-            makensis.exe /VERSION
+            makensis.exe test.nsi
 
       - name: Docker Hub login
         if: "${{ github.ref == 'refs/heads/main' }}"
@@ -132,10 +131,13 @@ jobs:
         if: "${{ matrix.nsis.version_major != '' }}"
         run: docker tag '${{ env.IMAGE_NAME_FULL }}' '${{ env.IMAGE_NAME_MAJOR }}'
 
-      - name: Test Linux GUI Application (GTK2)
+      - name: Test Image
         run: |
-          docker run --rm -v "${{ github.workspace }}/tests/gui_app:/app" -w /app --entrypoint='' '${{ env.IMAGE_NAME_FULL }}' \
-            makensis -VERSION
+          docker run --rm -v "${{ github.workspace }}/tests/gui_app:/app" \
+            -w /app \
+            --entrypoint='' \
+            '${{ env.IMAGE_NAME_FULL }}' \
+            makensis test.nsi
 
       - name: Docker Hub login
         if: "${{ github.ref == 'refs/heads/main' }}"
