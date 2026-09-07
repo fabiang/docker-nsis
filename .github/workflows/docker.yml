@@ -74,7 +74,7 @@ jobs:
 
       - name: Docker Hub login
         if: "${{ github.ref == 'refs/heads/main' }}"
-        uses: azure/docker-login@v1
+        uses: azure/docker-login@v2
         with:
           username: ${{ secrets.CONTAINER_REGISTRY_USERNAME }}
           password: ${{ secrets.CONTAINER_REGISTRY_PASSWORD }}
@@ -141,7 +141,7 @@ jobs:
 
       - name: Docker Hub login
         if: "${{ github.ref == 'refs/heads/main' }}"
-        uses: azure/docker-login@v1
+        uses: azure/docker-login@v2
         with:
           username: ${{ secrets.CONTAINER_REGISTRY_USERNAME }}
           password: ${{ secrets.CONTAINER_REGISTRY_PASSWORD }}
