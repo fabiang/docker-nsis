@@ -1,0 +1,32 @@
+[vars]
+docker_image_name = "fabiang/nsis"
+nsis_version = "3.12"
+nsis_download_hash_linux = "f3ed7a8e4aa2cf4e8cf47d3b563a02559e0cb4934db2662b2f9661b824e2b186"
+
+[tasks.build-alpine]
+description = "Build the Alpine image"
+run = """
+  docker build \
+    -f alpine/Dockerfile \
+    --build-arg NSIS_VERSION={{vars.nsis_version}} \
+    --build-arg NSIS_SOURCE_HASH={{vars.nsis_download_hash_linux}} \
+    -t {{vars.docker_image_name}}:{{vars.nsis_version}}-alpine .
+"""
+
+[tasks.test-alpine]
+description = "Build the Alpine image and compile the test installer"
+depends = "build-alpine"
+run = """
+  docker run --rm -v "$PWD/tests/gui_app:/installer" \
+    -w /installer \
+    --entrypoint='' \
+    {{vars.docker_image_name}}:{{vars.nsis_version}}-alpine \
+    makensis test.nsi \
+    && test -f tests/gui_app/test-installer.exe
+"""
+
+[tasks.build]
+depends = ["build-alpine"]
+
+[tasks.test]
+depends = ["test-alpine"]
