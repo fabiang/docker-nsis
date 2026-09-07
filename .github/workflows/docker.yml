@@ -35,6 +35,7 @@ jobs:
     runs-on: windows-${{ matrix.windows.runs_on }}
 
     continue-on-error: true
+    environment: prod
 
     name: "Win v${{ matrix.nsis.version }} (${{ matrix.windows.image }} – ${{ matrix.windows.version }})"
 
@@ -111,6 +112,8 @@ jobs:
       IMAGE_NAME_MAJOR: "fabiang/nsis:${{ matrix.nsis.version_major }}-alpine"
 
     name: "Alpine v${{ matrix.nsis.version }}"
+
+    environment: prod
 
     steps:
       - uses: actions/checkout@v3
