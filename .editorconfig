@@ -11,3 +11,7 @@ trim_trailing_whitespace = true
 
 [Dockerfile]
 indent_size = 4
+
+[*.nsi]
+charset = utf-8-bom
+end_of_line = crlf
