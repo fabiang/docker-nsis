@@ -20,15 +20,29 @@ RUN apk add --no-cache --virtual .build-deps \
     && echo "$NSIS_SOURCE_HASH  /tmp/nsis.tar.bz2" | sha256sum -c - \
     && tar -xjf /tmp/nsis.tar.bz2 --strip-components=1 -C /usr/src/nsis \
     && mkdir /tmp/zlib \
-    && curl -fsSL 'https://downloads.sourceforge.net/project/libpng/zlib/1.2.8/zlib128-dll.zip?r=&ts=1403402496&use_mirror=hivelocity' -o /tmp/zlib.zip \
+    && curl -fsSL \
+        'https://downloads.sourceforge.net/project/libpng/zlib/1.2.8/zlib128-dll.zip?r=&ts=1403402496&use_mirror=hivelocity' \
+        -o /tmp/zlib.zip \
     && unzip -q /tmp/zlib.zip -d /tmp/zlib \
     && cd /usr/src/nsis \
-    && scons ZLIB_W32=/tmp/zlib APPEND_CPPPATH=/usr/include/gnu-libiconv SKIPPLUGINS=all \
-    && scons ZLIB_W32=/tmp/zlib APPEND_CPPPATH=/usr/include/gnu-libiconv SKIPPLUGINS=all install PREFIX=/usr/local \
+    && scons \
+        ZLIB_W32=/tmp/zlib \
+        APPEND_CPPPATH=/usr/include/gnu-libiconv \
+    && scons \
+        ZLIB_W32=/tmp/zlib \
+        APPEND_CPPPATH=/usr/include/gnu-libiconv \
+        install PREFIX=/usr/local \
     && install -Dm755 build/urelease/makensis/makensis /usr/local/bin/makensis \
     && apk del .build-deps \
-    && apk add --no-cache gnu-libiconv-libs libgcc libstdc++ \
-    && rm -rf /usr/src/nsis /tmp/nsis.tar.bz2
+    && apk add --no-cache \
+        gnu-libiconv-libs \
+        libgcc \
+        libstdc++ \
+    && rm -rf \
+        /usr/src/nsis \
+        /tmp/nsis.tar.bz2 \
+        /tmp/zlib \
+        /tmp/zlib.zip
 
 WORKDIR /installer
 ENTRYPOINT ["makensis"]
